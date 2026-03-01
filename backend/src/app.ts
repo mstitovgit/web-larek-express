@@ -35,11 +35,12 @@ app.use('/product', productRouter);
 app.use('/order', orderRouter);
 app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
-app.use(errorLogger);
 
 app.use((_req, _res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);

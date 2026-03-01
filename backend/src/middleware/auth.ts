@@ -13,20 +13,24 @@ const auth = async (
   _res: Response,
   next: NextFunction,
 ) => {
-  const header = req.headers.authorization;
-
-  if (!header || !header.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Требуется авторизация');
-  }
-
-  const token = header.replace('Bearer ', '');
-
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const { authorization } = req.headers;
+
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedError('Требуется авторизация');
+    }
+
+    const token = authorization.replace('Bearer ', '');
+    let payload;
+    try {
+      payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    } catch (err) {
+      throw new UnauthorizedError('Требуется авторизация');
+    }
     req.user = { _id: payload._id };
-    return next();
+    next();
   } catch (err) {
-    return next(new UnauthorizedError('Невалидный токен'));
+    next(err);
   }
 };
 

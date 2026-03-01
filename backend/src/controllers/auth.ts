@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import User from '../models/user';
 import { attachAuth } from '../service/auth';
 import NotFoundError from '../errors/not-found-error';
@@ -23,12 +24,12 @@ export const register = async (
     });
 
     const authData = await attachAuth(res, user);
-    res.send(authData);
+    return res.send(authData);
   } catch (err) {
     if (err instanceof Error && err.message.includes('E11000')) {
-      throw new ConflictError('Пользователь с таким email уже существует');
+      return next(new ConflictError('Пользователь с таким email уже существует'));
     }
-    next(err);
+    return next(err);
   }
 };
 
@@ -111,7 +112,7 @@ export const getCurrentUser = async (
       throw new NotFoundError('Пользователь не найден');
     }
 
-    res.send({
+    return res.send({
       success: true,
       user: {
         name: user.name,
@@ -119,6 +120,9 @@ export const getCurrentUser = async (
       },
     });
   } catch (err) {
-    next(err);
+    if (err instanceof mongoose.Error.CastError) {
+      return next(new BadRequestError('Невалидный идентификтор'));
+    }
+    return next(err);
   }
 };

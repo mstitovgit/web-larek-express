@@ -12,7 +12,7 @@ import auth from '../middleware/auth';
 const authRouter = Router();
 
 authRouter.get('/token', refreshAccessToken);
-authRouter.get('/logout', logout);
+authRouter.get('/logout', auth, logout);
 authRouter.get('/user', auth, getCurrentUser);
 authRouter.post('/login', validateLoginData, login);
 authRouter.post('/register', validateRegisterData, register);

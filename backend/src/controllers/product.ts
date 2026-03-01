@@ -13,7 +13,7 @@ export const createProduct = async (
     const product = await Product.create(req.body);
 
     await moveImage(product.image.fileName);
-    res.send({
+    return res.send({
       description: product.description,
       image: product.image,
       title: product.title,
@@ -22,10 +22,10 @@ export const createProduct = async (
     });
   } catch (err) {
     if (err instanceof Error && err.message.includes('E11000')) {
-      throw new ConflictError('Товар с таким заголовком уже существует');
+      return next(new ConflictError('Товар с таким заголовком уже существует'));
     }
 
-    next(err);
+    return next(err);
   }
 };
 
