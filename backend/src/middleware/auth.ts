@@ -25,7 +25,7 @@ const auth = async (
     try {
       payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
     } catch (err) {
-      throw new UnauthorizedError('Требуется авторизация');
+      throw new UnauthorizedError('Невалидный токен');
     }
     req.user = { _id: payload._id };
     next();
